@@ -1,0 +1,20 @@
+{
+  "contrast": "true",
+  "results": [
+    {
+      "text": "Oxy sắp hết! Lên mặt nước",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(0, 0, 0)"
+    },
+    {
+      "text": "Thủy quái gần!",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(0, 0, 0)"
+    },
+    {
+      "text": "Bàn T1: khách sắp giận!",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(0, 0, 0)"
+    }
+  ]
+}

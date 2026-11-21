@@ -1,12 +1,12 @@
 # ArsNeonci — phản tư cá nhân (≤ 200 từ)
 
 - **Tôi đã làm (kèm link commit):**
-  - Thiết lập cấu hình nhóm 2 thành viên (`TEAM.md`, `game.contract.json`), ghi nhật ký làm rõ yêu cầu (`docs/clarify.md`) và kế hoạch Phase 1 (`docs/plan/phase-1.md`).
-  - Cài đặt Lát 1 (`dive`/`surface`, oxy, ngạt `zero_oxy_ticks`, `choke`, `faint`, giỏ LIFO) và Lát 2 (hái nút, mọc lại `node_regrown`, bắt cá dưới nước, hồi chiêu `catch_cd_ticks`, xuất kho) trong `chonoi/sim/gather.py`.
-  - Viết bộ unit/black-box test riêng trong `tests/test_gather.py` và xây dựng skill `.agents/skills/gather-proof/` để sinh bằng chứng `docs/proof/phase-1/`.
+  - Thiết lập cấu hình nhóm (`TEAM.md`, `game.contract.json`), `docs/clarify.md` và kế hoạch Phase 1 ([`fe3052a`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/fe3052a)).
+  - Cài đặt Lát 1 (`dive`/`surface`, oxy, ngạt, `choke`, `faint`, giỏ LIFO — [`0d26d73`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/0d26d73)) và Lát 2 (hái nút, mọc lại, bắt cá, hồi chiêu — [`4c0f6b7`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/4c0f6b7)) trong `chonoi/sim/gather.py` cùng `tests/test_gather.py`.
+  - Xây dựng 2 skills Harness AI (`gather-proof`, `verify-transfer` — [`f095664`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/f095664)), merge tích hợp nhánh `develop` ([`2ca7983`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/2ca7983)), nâng cấp HUD `chonoi/web/index.html` và hoàn thiện hồ sơ kiểm chứng/retro.
 - **Tôi đã review (kèm link):**
-  - Rà soát hợp đồng tích hợp file kho (`inventory.sample.json` / `gather-kho.json`) và đọc chéo luồng `chonoi/sim/quan.py` cùng `NguyenGL03`.
+  - Đọc chéo các commit `quan` của `NguyenGL03`: [`7936b69`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/7936b69), [`b8ec20b`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/b8ec20b), [`3691aeb`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/3691aeb) và đồng bộ hiển thị `stove.dish.dish_id` trên UI.
 - **AI sai ở đâu và tôi phát hiện thế nào:**
-  - Khi chạy lệnh gộp trên Windows PowerShell 5.1, AI dùng `&&` khiến lệnh lỗi cú pháp; phát hiện qua mã thoát và đổi sang kiểm tra `$LASTEXITCODE`. Ngoài ra, rà kỹ mốc giảm oxy từ `1 -> 0` để không đếm chồng tick ngạt đầu tiên vào tick vừa cạn oxy.
+  - Script `run_gather_proof.py` do AI sinh thiếu một bậc `os.path.dirname` ở biến `ROOT` gây lỗi `ModuleNotFoundError: No module named 'chonoi'`; tôi phát hiện ngay khi chạy lệnh kiểm chứng thực tế và sửa lại.
 - **Điều tôi học được:**
-  - Chia ranh giới file theo module (`gather.py` + `test_gather.py` tách khỏi `quan.py` + `test_quan.py`) giúp làm việc nhóm với AI tốc độ cao mà không xảy ra xung đột Git.
+  - Cô lập phạm vi file theo module và tự động hóa kiểm chứng bằng skill giúp nhóm 2 người ghép code với 0% xung đột Git.

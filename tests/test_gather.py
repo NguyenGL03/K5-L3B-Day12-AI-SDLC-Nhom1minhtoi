@@ -195,6 +195,53 @@ class GatherSlice2Test(unittest.TestCase):
         self.assertEqual(len(s_full.sim.fish), 1, "giỏ không đủ chỗ thì đàn cá không bị mất")
         self.assertEqual(s_full.sim.catch_cd_ticks, 0)
 
+    def test_end_to_end_gather_to_quan_cook_and_pay(self):
+        """Luồng tích hợp thực tế: gather hái N1 + lặn bắt F1 + cập bến -> xuất kho -> quan nấu lẩu cá linh điên điển & thu tiền."""
+        with Workdir() as w:
+            g_inp = write_json(w.path("g_in.json"), frames(
+                {"tick": 0, "move": [1, 0]},
+                {"tick": 155, "move": [0, 0], "interact": True},
+                {"tick": 156, "interact": False, "move": [0.5, 1]},
+                {"tick": 245, "move": [0, 0], "catch": True},
+                {"tick": 246, "catch": False, "move": [-1, -0.45]},
+                {"tick": 460, "move": [0, 0], "interact": True},
+            ))
+            inv = w.path("kho.json")
+            g_out = w.path("gather.jsonl")
+            scenario = write_json(w.path("gather-scenario.json"), {"gather": {
+                "random_fish": False, "fish": [{"id": "F1", "kind": "ca_linh", "pos": [15, 5]}],
+            }})
+            code, err = run_headless(
+                "--mode", "gather", "--seed", "1", "--ticks", "600",
+                "--scenario", scenario, "--inputs", g_inp, "--inventory-out", inv, "--out", g_out
+            )
+            self.assertEqual(code, 0, err)
+            with open(inv, encoding="utf-8") as f:
+                self.assertEqual(json.load(f), {"items": {"bong_dien_dien": 1, "ca_linh": 3}})
+
+            q_inp = write_json(w.path("q_in.json"), frames(
+                {"tick": 0, "move": [-1, 0.5]},
+                {"tick": 110, "move": [0, 0]},
+                {"tick": 125, "interact": True},
+                {"tick": 126, "interact": False},
+                {"tick": 730, "interact": True},
+                {"tick": 731, "interact": False, "move": [1, -0.86]},
+                {"tick": 865, "move": [0, 0], "interact": True},
+                {"tick": 866, "interact": False},
+            ))
+            q_out = w.path("quan.jsonl")
+            code, err = run_headless(
+                "--mode", "quan", "--seed", "1", "--ticks", "1500",
+                "--inventory", inv, "--inputs", q_inp, "--out", q_out
+            )
+            self.assertEqual(code, 0, err)
+            q_rows = read_jsonl(q_out)
+            paid = events(q_rows, "paid")
+            self.assertEqual(len(paid), 1)
+            self.assertEqual(paid[0]["data"]["amount"], 144)
+            self.assertEqual(q_rows[-1]["money"], 144)
+            self.assertEqual(q_rows[-1]["score"], 444)
+
 
 if __name__ == "__main__":
     unittest.main()

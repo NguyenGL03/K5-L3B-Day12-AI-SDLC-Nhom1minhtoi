@@ -4,13 +4,14 @@
 
 ## Lệnh
 - Test: `PYTHONPATH=tests:. python3 -m unittest discover -s tests -v`
-- Kiểm vòng ngày v1.1: `python3 tools/check_day.py`
+- Kiểm vòng ngày: `python3 tools/check_day.py`
 - Headless: `python3 -m chonoi.headless --mode day --days 1 --seed 1 --ticks 22200 --out out.jsonl`
 - Chơi thử: `python3 -m chonoi.live --mode day` (WASD, E, Space, Esc/P)
+- Phase 4: dùng `bench_cmd` và `soak_cmd` từ manifest. Xem tham số trong [README](README.md).
 
 ## Cấu trúc & quy ước
 - (Starter Python là TÙY CHỌN; nhóm có thể dùng ngôn ngữ khác nếu giữ Test Contract.) Khung do giảng viên cấp: `chonoi/{headless,inputs,scenario,contract,rng,ids,jsonl,inventory,runner,live}.py` và `chonoi/web/`. Hạn chế sửa; nếu phải sửa thì báo cả nhóm và ghi lại lý do.
-- Luật chơi trong `chonoi/sim/`. Khi làm Phase 3, xem trạng thái chuyển schema trong [bằng chứng Phase 3](docs/proof/phase-3/quan.md).
+- Luật chơi trong `chonoi/sim/`. Khi sửa kho, xem [quy tắc giá và giữ chỗ](docs/verification/phase-3.md).
 - **Số liệu chỉ đọc từ `game.contract.json` / dữ liệu**, không hard-code trong luật.
 - Mọi số ngẫu nhiên đi qua `Streams` (`chonoi/rng.py`); không dùng `random` toàn cục, không dùng đồng hồ hệ thống.
 - Sắp danh sách thực thể bằng `ids.sort_by_id`; cấp id bằng `IdAllocator`.
@@ -29,4 +30,6 @@
 ## Skills / hooks của nhóm
 - `gather-proof` (`.agents/skills/gather-proof/SKILL.md`): Chạy kiểm chứng tính tất định byte-for-byte cho chế độ `gather` và sinh bộ bằng chứng headless (`gather-docked.jsonl`, `gather-fainted.jsonl`, `gather-kho.json`) vào `docs/proof/phase-<n>/`. Lệnh: `python3 .agents/skills/gather-proof/scripts/run_gather_proof.py --phase 1`.
 - `tools/check_day.py`: Chạy hai lượt headless cùng seed, kiểm thứ tự ba pha, `days_completed` và tính tất định của JSONL.
+- `verify-transfer` (`.agents/skills/verify-transfer/SKILL.md`): Kiểm chứng luồng bàn giao kho End-to-End từ `gather` sang `quan` (`gather-kho.json` → `quan-from-gather.jsonl`), đối chiếu `stock` tick 0, xác minh đầy đủ chuỗi sự kiện nấu–bưng–phục vụ–thanh toán và tính tất định byte-for-byte của `quan`. Lệnh: `python3 .agents/skills/verify-transfer/scripts/run_verify_transfer.py`.
+- Hai skill dùng bản Phase 1 có đàn cá đứng yên. Đặt `CHONOI_CONTRACT=tests/fixtures/contract_v10.json` trước khi chạy lại.
 

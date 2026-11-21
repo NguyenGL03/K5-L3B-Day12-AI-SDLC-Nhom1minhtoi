@@ -13,4 +13,4 @@ Các ca dưới đây chạy trên `QuanStock`, phần xử lý kho cá thể �
 python -m unittest discover -s tests -p test_quan_stock_phase3.py -v
 ```
 
-Reader/writer v1.2 đã dùng chung với Gather và được kiểm qua file. HUD có thể đếm hàng ươn và kho khả dụng khi nhận snapshot cá thể. Bản ticket đã nhận thiếu công thức chốt giá theo độ tươi và chi tiết thay phần giữ vừa ươn cho đơn thường. Sau khi có hai quy tắc đó, nối `QuanStock` vào tick Quán sau khi giảm timer và trước khi xét bếp, rồi kiểm chứng giữ chỗ, thanh toán, HUD và bàn giao qua cả file lẫn `day` trước khi bật v1.2. [Ma trận Phase 3](../../verification/phase-3.md)
+Reader/writer đã được kiểm qua file và trong vòng ngày. HUD đếm hàng ươn và kho khả dụng từ snapshot cá thể. Test Quán xác nhận hàng ươn được thay trước khi nấu, giá chốt theo độ tươi lúc dùng và đơn thiếu phần bù nhả toàn bộ phần giữ. [Ma trận Phase 3](../../verification/phase-3.md)
