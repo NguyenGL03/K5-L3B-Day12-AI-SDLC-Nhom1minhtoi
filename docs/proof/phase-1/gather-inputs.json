@@ -1,0 +1,51 @@
+{
+  "frames": [
+    {
+      "tick": 0,
+      "move": [
+        1,
+        0
+      ]
+    },
+    {
+      "tick": 155,
+      "move": [
+        0,
+        0
+      ],
+      "interact": true
+    },
+    {
+      "tick": 156,
+      "interact": false,
+      "move": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "tick": 245,
+      "move": [
+        0,
+        0
+      ],
+      "catch": true
+    },
+    {
+      "tick": 246,
+      "catch": false,
+      "move": [
+        -1,
+        -0.45
+      ]
+    },
+    {
+      "tick": 460,
+      "move": [
+        0,
+        0
+      ],
+      "interact": true
+    }
+  ]
+}
