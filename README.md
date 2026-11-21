@@ -18,10 +18,12 @@ Cách làm việc kỹ thuật là **tự do** (push thẳng, nhánh + PR, pair,
 ```bash
 git clone <fork-của-nhóm> && cd <fork-của-nhóm>
 PYTHONPATH=tests:. python3 -m unittest discover -s tests -v        # smoke test
-python3 -m chonoi.live --mode gather                                # chơi thử trên trình duyệt (tùy chọn)
+python3 -m chonoi.live --mode day                                   # mở địa chỉ in ra trên trình duyệt
 ```
 
-Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headless --mode gather|quan …`) để được chạy và chấm tự động. **Công nghệ không ràng buộc**: khung Python trong `chonoi/` chỉ là gợi ý, chi tiết ở [`docs/STARTER.md`](docs/STARTER.md).
+Chơi bằng WASD hoặc phím mũi tên. **E** hái, cập bến, nấu, lấy món hoặc phục vụ tùy vị trí. **Space** bắt cá, **Esc/P** tạm dừng, **R** chơi lại. Điểm bằng tổng tiền thu gồm boa cộng `100 × floor(uy tín)`. Mua nâng cấp chỉ trừ tiền trong ví.
+
+Chạy headless với `--mode gather`, `--mode quan` hoặc `--mode day`. `python3 tools/check_day.py` kiểm một Ngày đầy đủ và so JSONL của hai lượt cùng seed. Xem [kiểm chứng Phase 2](docs/verification/phase-2.md) và [trạng thái Phase 3](docs/verification/phase-3.md).
 
 ## Tự do sáng tạo
 

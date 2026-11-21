@@ -12,6 +12,13 @@ from chonoi.runner import Session
 from helpers import Workdir, frames, write_json
 
 
+from helpers import use_count_contract
+
+
+def setUpModule():
+    use_count_contract()
+
+
 class Units(unittest.TestCase):
     def test_id_sorting(self):
         self.assertEqual([e["id"] for e in sort_by_id([{"id": "F10"}, {"id": "F2"}, {"id": "B1"}])], ["B1", "F2", "F10"])

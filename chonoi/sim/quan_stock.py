@@ -5,35 +5,18 @@ from fractions import Fraction
 
 from ..errors import BadInput
 from ..ids import id_key, sort_by_id
+from ..inventory import decay_freshness, exact_freshness, public_freshness, validate_individual_items
 
 
 class QuanStock:
-    def __init__(self, items, kinds, freshness, tick_hz):
+    def __init__(self, items, kinds, freshness, tick_hz, *, exact=False):
         self.threshold = Fraction(str(freshness["spoiled_below"]))
         self.decay_per_tick = Fraction(str(freshness["quan_decay_per_s"])) / tick_hz
-        self.items = {}
-        if not isinstance(items, list):
-            raise BadInput("kho Quán v1.2 phải là mảng cá thể")
-        for item in items:
-            if not isinstance(item, dict) or item.keys() != {"id", "kind", "fresh"}:
-                raise BadInput("cá thể phải chứa đúng id, kind và fresh")
-            item_id, kind, fresh = item["id"], item["kind"], item["fresh"]
-            if not isinstance(item_id, str) or not item_id or item_id in self.items:
-                raise BadInput("id cá thể phải là chuỗi khác rỗng và duy nhất")
-            if not isinstance(kind, str) or kind not in kinds:
-                raise BadInput(f"nguyên liệu lạ: {kind}")
-            if type(fresh) not in (int, float) or not 0 <= fresh <= 100:
-                raise BadInput(f"{item_id}.fresh phải là số hữu hạn trong [0,100]")
-            self.items[item_id] = {"id": item_id, "kind": kind, "fresh": Fraction(str(fresh))}
+        items = [item.copy() for item in items] if exact else exact_freshness(validate_individual_items(items, kinds))
+        self.items = {item["id"]: item for item in items}
 
     def advance(self):
-        events = []
-        for item in sort_by_id(self.items.values()):
-            previous = item["fresh"]
-            item["fresh"] = max(0, previous - self.decay_per_tick)
-            if item["fresh"] < self.threshold <= previous:
-                events.append(("spoiled", {"item_id": item["id"], "kind": item["kind"], "location": "stock"}))
-        return events
+        return decay_freshness(self.items.values(), self.decay_per_tick, self.threshold, "stock")
 
     def reserve(self, recipe, claimed):
         candidates = sorted(self.items.values(), key=lambda item: (-item["fresh"], id_key(item["id"])))
@@ -61,5 +44,20 @@ class QuanStock:
         if counts != recipe:
             raise BadInput("cá thể giữ chỗ không đủ đúng công thức")
 
+    def replace_spoiled(self, recipe, held, claimed):
+        good = [item_id for item_id in held if self.items[item_id]["fresh"] >= self.threshold]
+        if len(good) == len(held):
+            return held
+        required = Counter(recipe)
+        required.subtract(self.items[item_id]["kind"] for item_id in good)
+        replacement = self.reserve(required, claimed.union(good))
+        return good + replacement if replacement is not None else None
+
+    def consume(self, reserved, list_price, initial_freshness):
+        items = sorted((self.items.pop(item_id) for item_id in reserved), key=lambda item: (item["kind"], id_key(item["id"])))
+        mean = sum(item["fresh"] for item in items) / len(items)
+        price = (list_price * mean) // Fraction(str(initial_freshness))
+        return public_freshness(items, self.threshold), price
+
     def snapshot(self):
-        return [dict(item, fresh=float(item["fresh"])) for item in sort_by_id(self.items.values())]
+        return public_freshness(sort_by_id(self.items.values()), self.threshold)

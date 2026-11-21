@@ -10,21 +10,28 @@ from chonoi.rng import Streams
 from chonoi.sim.quan import QuanSim
 
 
-def phase2_tuning():
-    data = json.loads(Path(__file__).with_name("fixtures").joinpath("quan_phase2.json").read_text(encoding="utf-8"))
-    tuning = load_contract()["tuning"]
-    tuning["quan"].update(data["quan"])
-    tuning["menu"].update(data["menu_additions"])
-    tuning["day_plan"] = data["day_plan"]
-    return tuning
+from helpers import use_count_contract
+
+
+def setUpModule():
+    use_count_contract()
 
 
 class QuanPhase2(unittest.TestCase):
     def setUp(self):
-        self.tuning = phase2_tuning()
+        self.tuning = load_contract()["tuning"]
 
     def build(self, scenario, **params):
         return QuanSim(self.tuning, scenario, Streams(1), IdAllocator(), **params)
+
+    def test_manifest_matches_ticket(self):
+        path = Path(__file__).with_name("fixtures") / "quan_phase2.json"
+        expected = json.loads(path.read_text(encoding="utf-8"))
+        for key, value in expected["quan"].items():
+            self.assertEqual(self.tuning["quan"][key], value)
+        for dish_id, dish in expected["menu_additions"].items():
+            self.assertEqual(self.tuning["menu"][dish_id], dish)
+        self.assertEqual(self.tuning["day_plan"], expected["day_plan"])
 
     def test_day_plans_match_recipes_and_allowed_menu(self):
         for plan in self.tuning["day_plan"]:

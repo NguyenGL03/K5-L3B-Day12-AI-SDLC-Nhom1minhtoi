@@ -5,9 +5,20 @@ import math
 import os
 import shlex
 import subprocess
+import sys
 import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def use_count_contract():
+    path = str(Path(__file__).with_name("fixtures") / "contract_v11.json")
+    settings = patch.dict(os.environ, {"CHONOI_CONTRACT": path})
+    settings.start()
+    unittest.addModuleCleanup(settings.stop)
 
 
 def write_json(path, obj):
@@ -23,7 +34,10 @@ def frames(*fr):
 def headless_cmd():
     """Lệnh headless khai trong game.contract.json — test chạy qua đây nên dùng được với MỌI ngôn ngữ."""
     with open(os.path.join(ROOT, "game.contract.json"), encoding="utf-8") as f:
-        return shlex.split(json.load(f)["headless_cmd"])
+        command = shlex.split(json.load(f)["headless_cmd"])
+    if sys.platform == "win32" and command[:1] == ["python3"]:
+        command[0] = sys.executable
+    return command
 
 
 def run_headless(*args, cwd=ROOT):

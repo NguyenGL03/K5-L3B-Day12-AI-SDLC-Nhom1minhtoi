@@ -10,6 +10,13 @@ from chonoi.contract import load_contract
 from chonoi.live import LiveGame, LiveServer
 
 
+from helpers import use_count_contract
+
+
+def setUpModule():
+    use_count_contract()
+
+
 def _get(url):
     with urllib.request.urlopen(url, timeout=5) as r:
         return r.status, r.read()

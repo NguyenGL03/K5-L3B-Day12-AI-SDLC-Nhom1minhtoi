@@ -12,6 +12,13 @@ from chonoi.headless import main
 from helpers import ROOT, Workdir, events, frames, read_jsonl, snapshots, write_json
 
 
+from helpers import use_count_contract
+
+
+def setUpModule():
+    use_count_contract()
+
+
 class QuanPhase1(unittest.TestCase):
     def run_quan(self, ticks, out, *args):
         return main(["--mode", "quan", "--seed", "1", "--ticks", str(ticks),

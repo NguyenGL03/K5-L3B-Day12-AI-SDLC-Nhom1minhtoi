@@ -11,6 +11,13 @@ from chonoi.runner import Session
 from helpers import Workdir, events, frames, read_jsonl, run_headless, snapshots, write_json
 
 
+from helpers import use_count_contract
+
+
+def setUpModule():
+    use_count_contract()
+
+
 def _tuning():
     return load_contract()["tuning"]
 
@@ -50,7 +57,7 @@ class GatherSlice1Test(unittest.TestCase):
         ev2 = s.step(ip.advance(1))
         self.assertEqual(s.sim.oxygen_ticks, 0)
         self.assertEqual([e["name"] for e in ev2], ["oxygen_empty"])
-        self.assertEqual(s.sim.zero_oxy_ticks, 0)
+        self.assertEqual(s.sim.zero_oxy_ticks, 1)  # Tính cả bước vừa chạm oxy 0 theo PRD.
 
         # Trên mặt nước: hồi oxygen_refill_per_tick và kẹp ở oxygen_max, xóa zero_oxy_ticks
         s2 = Session("gather", tuning, {"player": {"pos": [10.0, 0.0], "oxygen_ticks": omax - refill // 2}}, 1)
@@ -180,10 +187,13 @@ class GatherSlice2Test(unittest.TestCase):
         s_full = Session("gather", tuning, {
             "player": {"pos": [15.0, 5.0]},
             "hold": ["ca_loc"] * (cap - 2),
+            "fish": [{"id": "F1", "kind": "ca_linh", "pos": [15, 5]}],
+            "random_fish": False,
         }, 1)
         ev_full = s_full.step(InputPlayer([{"tick": 0, "catch": True}]).advance(0))
         self.assertEqual([e["name"] for e in ev_full], ["hold_full"])
-        self.assertEqual(len(s_full.sim.fish), 6, "giỏ không đủ chỗ thì đàn cá không bị mất")
+        self.assertEqual(len(s_full.sim.fish), 1, "giỏ không đủ chỗ thì đàn cá không bị mất")
+        self.assertEqual(s_full.sim.catch_cd_ticks, 0)
 
 
 if __name__ == "__main__":
