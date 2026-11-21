@@ -27,6 +27,17 @@ Game cần chế độ **headless** theo Test Contract (`python3 -m chonoi.headl
 
 Ngoài phần đề yêu cầu, nhóm được **thêm** nhân vật, loài cá/cây, sinh vật, món, bản đồ, cơ chế, câu chuyện, đồ họa, âm nhạc… với ba điều kiện: **không phá phần cố định** (tắt ở headless), ghi mục **"Sáng tạo của nhóm"** trong README của nhóm, và **làm lõi đúng trước**.
 
+### Sáng tạo của nhóm (`Nhom1minhtao`)
+Các mở rộng dưới đây được cài đặt hoàn toàn ở tầng hiển thị trình duyệt (`chonoi/web/index.html`) hoặc module mở rộng tách biệt (`chonoi/sim/quan_stock.py`), **tắt hoàn toàn khi chạy headless** nên không ảnh hưởng tới kết quả chấm tự động:
+1. **Hiệu ứng thị giác & cảnh báo sinh tồn khi lặn (`gather`):**
+   - Hiệu ứng bọt khí nổi lên theo nhịp bơi khi Út Sen lặn dưới mặt nước (`d > surface_depth`).
+   - Viền cảnh báo nhịp thở (pulse đỏ quanh màn hình) khi lượng oxy xuống dưới 25% hoặc đang trong trạng thái ngạt (`zero_oxy_ticks > 0`).
+2. **Đèn lồng chợ nổi đêm & HUD quản lý quán thông minh (`quan`):**
+   - Ánh đèn lồng vàng ấm tỏa sáng quanh từng bàn ăn trên ghe quán buổi tối.
+   - Hiển thị tên món tiếng Việt đầy đủ cho cả 6 món miền Tây (*Cá lóc nướng trui*, *Gỏi bông súng*, *Lẩu cá linh điên điển*, *Canh chua cá lóc*, *Cá kèo nướng*, *Lẩu mắm*), mã đơn hàng gắn với từng bếp/tay bưng, và màu sắc phân biệt trạng thái khách (*Đang chờ đặt bếp* / *Đã giao bếp nấu* / *Đang thưởng thức*).
+   - HUD **Kho khả dụng** tự động tính và hiển thị riêng số lượng nguyên liệu còn tự do so với số lượng đang được giữ chỗ (`giữ N`) cho các bàn đang chờ.
+
+
 ## Lịch 3 giờ
 
 | Mốc | Phase | Hạn tag |

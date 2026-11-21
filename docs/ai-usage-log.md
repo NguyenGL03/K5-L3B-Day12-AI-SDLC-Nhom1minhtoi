@@ -2,5 +2,11 @@
 
 | Phase | Người | Công cụ / model | Việc | Token / chi phí ước tính | Ghi chú (AI sai ở đâu?) |
 |---|---|---|---|---|---|
-| Phase 1 | `ArsNeonci` | Antigravity (Gemini) | Đọc tài liệu dự án, phân tích tránh conflict Git, cài đặt Lát 1 & Lát 2 trong `chonoi/sim/gather.py`, viết `tests/test_gather.py` và skill `gather-proof` | ~25k tokens | AI dùng toán tử `&&` trên PowerShell 5.1 làm lệnh gộp báo lỗi cú pháp; phát hiện ngay qua stderr và chuyển sang `; if ($LASTEXITCODE -eq 0)` |
+| Phase 1 | `ArsNeonci` | Antigravity (Gemini) | Đọc tài liệu dự án, phân tích tránh conflict Git, cài đặt Lát 1 & Lát 2 trong `chonoi/sim/gather.py`, viết `tests/test_gather.py` và skill `gather-proof` | ~25k tokens | AI dùng toán tử `&&` trên PowerShell 5.1 và tính thiếu 1 cấp `dirname` trong `run_gather_proof.py`; phát hiện ngay khi chạy lệnh thực tế và sửa lại |
+| Phase 1 | `NguyenGL03` | Coding Agent | Phân công Lab 12 (`docs/plan/phan-cong-lab12.md`), cài đặt luật Quán Phase 1 trong `chonoi/sim/quan.py`, viết `tests/test_quan_phase1.py` và `docs/proof/phase-1/quan.md` | ~25k tokens | AI ban đầu chưa tính trường hợp khách đang ăn khi hết giờ đóng ca (`reason: closing`); bổ sung test biên ở tick đóng ca để phát hiện và sửa |
+| Phase 2 | `NguyenGL03` | Coding Agent | Mở rộng `QuanSim` hỗ trợ 2 bếp, 4 bàn, 6 món, kế hoạch ngày `day_plan` (`D1`–`D5`) và số dư xuyên ngày (`tests/test_quan_phase2.py`) | ~20k tokens | Cần đảm bảo số suất trong `day_plan` chỉ giới hạn loại món trong ngày chứ không chặn khách gọi thêm khi kho còn nguyên liệu |
+| Phase 2 | `ArsNeonci` | Antigravity (Gemini) | Rà soát tích hợp nhánh `develop`, lập kế hoạch & ma trận kiểm chứng `docs/verification/phase-2.md`, ghi retro nhanh Phase 2 | ~12k tokens | Không |
+| Phase 3 | `NguyenGL03` | Coding Agent | Thiết kế kho cá thể `QuanStock` (`chonoi/sim/quan_stock.py`), hao độ tươi, phát sự kiện `spoiled` và giữ chỗ ưu tiên độ tươi (`tests/test_quan_stock_phase3.py`) | ~15k tokens | Phép trừ `float` mỗi tick (`0.25/60`) dễ lệch ở biên `30.0`; phát hiện qua test biên `30.0125` và đổi sang dùng `fractions.Fraction` |
+| Phase 3–4 | `ArsNeonci` | Antigravity (Gemini) | Viết ADR-0001, tạo skill thứ 2 `verify-transfer`, nâng cấp HUD/UI `chonoi/web/index.html`, hoàn thiện ma trận `docs/verification/phase-1..4.md`, `docs/retro.md`, `CREDITS.md`, `CHANGELOG.md` | ~28k tokens | HUD cũ vẽ `st.dish` dạng chuỗi trong khi `QuanSim` lưu object `{"order_id", "dish_id", "base_price"}`; phát hiện khi review chéo và sửa lại trong `index.html` |
+
 

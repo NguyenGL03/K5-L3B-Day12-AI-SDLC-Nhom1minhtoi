@@ -27,4 +27,6 @@
 
 ## Skills / hooks của nhóm
 - `gather-proof` (`.agents/skills/gather-proof/SKILL.md`): Chạy kiểm chứng tính tất định byte-for-byte cho chế độ `gather` và sinh bộ bằng chứng headless (`gather-docked.jsonl`, `gather-fainted.jsonl`, `gather-kho.json`) vào `docs/proof/phase-<n>/`. Lệnh: `python3 .agents/skills/gather-proof/scripts/run_gather_proof.py --phase 1`.
+- `verify-transfer` (`.agents/skills/verify-transfer/SKILL.md`): Kiểm chứng luồng bàn giao kho End-to-End từ `gather` sang `quan` (`gather-kho.json` → `quan-from-gather.jsonl`), đối chiếu `stock` tick 0, xác minh đầy đủ chuỗi sự kiện nấu–bưng–phục vụ–thanh toán và tính tất định byte-for-byte của `quan`. Lệnh: `python3 .agents/skills/verify-transfer/scripts/run_verify_transfer.py`.
+
 
