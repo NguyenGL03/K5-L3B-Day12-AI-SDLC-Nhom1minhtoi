@@ -26,4 +26,5 @@
 - Sáng tạo thêm được khuyến khích nhưng phải tắt ở headless (xem README, mục "Tự do sáng tạo").
 
 ## Skills / hooks của nhóm
-- (Ghi tên và khi nào dùng; tối thiểu 2 skill/hook/command nhóm tự viết, đặt ở `.agents/skills/` hoặc tương đương.)
+- `gather-proof` (`.agents/skills/gather-proof/SKILL.md`): Chạy kiểm chứng tính tất định byte-for-byte cho chế độ `gather` và sinh bộ bằng chứng headless (`gather-docked.jsonl`, `gather-fainted.jsonl`, `gather-kho.json`) vào `docs/proof/phase-<n>/`. Lệnh: `python3 .agents/skills/gather-proof/scripts/run_gather_proof.py --phase 1`.
+
