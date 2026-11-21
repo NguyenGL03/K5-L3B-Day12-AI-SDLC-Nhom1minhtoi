@@ -1,0 +1,12 @@
+{
+  "fish_initial": 12,
+  "fish_max": 18,
+  "fish_spawn_ticks": 180,
+  "fish_spawn_x": [8, 15, 24, 30, 39, 45, 54, 60, 69, 75, 84, 90],
+  "lilies": {
+    "initial_x": [10, 20],
+    "spawn_x": [16, 24, 34, 40, 48, 54, 66, 72, 84, 94],
+    "spawn_ticks": 480,
+    "max_nodes": 8
+  }
+}

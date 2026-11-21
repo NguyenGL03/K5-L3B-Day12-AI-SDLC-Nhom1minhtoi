@@ -1,13 +1,6 @@
 # NguyenGL03 — phản tư cá nhân (≤ 200 từ)
 
-- **Tôi đã làm (kèm link commit):**
-  - Lập kế hoạch phân công nhóm 2 người tại `docs/plan/phan-cong-lab12.md` ([`40c42aa`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/40c42aa)).
-  - Cài đặt toàn bộ luật chơi buổi tối `chonoi/sim/quan.py` cho Phase 1 (khách đến, giữ chỗ, nấu bếp, bưng phục vụ, thanh toán, boa, uy tín — [`7936b69`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/7936b69)) kèm `tests/test_quan_phase1.py` và `docs/proof/phase-1/quan.md`.
-  - Mở rộng `QuanSim` cho Phase 2 hỗ trợ 2 bếp, 4 bàn, 6 món, kế hoạch ngày `day_plan` và kết chuyển số dư ([`b8ec20b`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/b8ec20b)).
-  - Thiết kế lớp `QuanStock` (`chonoi/sim/quan_stock.py`) cho Phase 3 quản lý độ tươi cá thể và sự kiện `spoiled` ([`3691aeb`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/3691aeb)).
-- **Tôi đã review (kèm link):**
-  - Đọc chéo phần `chonoi/sim/gather.py` và file kho bàn giao `gather-kho.json` từ `ArsNeonci` ([`0d26d73`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/0d26d73), [`4c0f6b7`](https://github.com/NguyenGL03/K5-L3B-Day12-AI-SDLC-Nhom1minhtoi/commit/4c0f6b7)).
-- **AI sai ở đâu và tôi phát hiện thế nào:**
-  - Phép trừ độ tươi mỗi tick (`0.25 / 60`) nếu dùng `float` dễ gây sai số ở biên ngưỡng ươn `30`; tôi phát hiện khi viết test biên `30.0125` và chuyển sang `fractions.Fraction`.
-- **Điều tôi học được:**
-  - Dùng kiểu số chính xác (`Decimal`, `Fraction`) và tách lớp `QuanStock` giúp vừa đáp ứng yêu cầu mở rộng vừa giữ toàn bộ test hồi quy luôn xanh.
+- **Tôi đã làm.** Lập kế hoạch nhóm, xây logic Quán và mở rộng thực đơn theo ngày. Sau đó tôi tích hợp độ tươi, chạy hồi quy và đóng gói bản sửa Phase 4. [`40c42aa`](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/commit/40c42aa) · [`7936b69`](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/commit/7936b69) · [`b8ec20b`](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/commit/b8ec20b) · [`3691aeb`](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/commit/3691aeb) · [`a803fc7`](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/commit/a803fc7)
+- **Tôi đã phối hợp với ArsNeonci.** Đọc chéo Gather, đối chiếu file kho và chạy lại ca bàn giao tới Quán sau khi hợp nhất. [Bằng chứng](../verification/phase-1.md)
+- **AI sai ở đâu.** Trừ độ tươi mỗi tick bằng `float` có thể lệch tại ngưỡng 30. Test bắt đầu từ 30,0125 kiểm đúng tick phát `spoiled`. [Ca kiểm](../../tests/test_quan_stock_phase3.py)
+- **Điều tôi học được.** Kiểm thử theo schema từng phiên bản và khóa ca biên bằng dữ liệu cố định trước khi thay luật.

@@ -29,6 +29,8 @@ from .runner import Session
 from .scenario import load_scenario
 
 WEB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
+WEB_ASSETS = {"/": ("index.html", "text/html"), "/index.html": ("index.html", "text/html"),
+              "/river.js": ("river.js", "text/javascript")}
 TICK_S = 1.0 / 60.0
 MAX_BODY = 4096
 RECENT_EVENTS = 40
@@ -208,12 +210,13 @@ class _Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         if path == "/state":
             self._send(200, self.game.state_json())
-        elif path in ("/", "/index.html"):
+        elif path in WEB_ASSETS:
+            filename, mime = WEB_ASSETS[path]
             try:
-                with open(os.path.join(WEB_DIR, "index.html"), "rb") as f:
-                    self._send(200, f.read(), "text/html; charset=utf-8")
+                with open(os.path.join(WEB_DIR, filename), "rb") as f:
+                    self._send(200, f.read(), mime + "; charset=utf-8")
             except OSError:
-                self._send(404, b'{"error":"thieu index.html"}')
+                self._send(404, b'{"error":"thieu tai nguyen"}')
         else:
             self._send(404, b'{"error":"khong co"}')
 
@@ -280,6 +283,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="chonoi.live", description="Chơi trực tiếp trên trình duyệt (starter).")
     p.add_argument("--mode", required=True, choices=["gather", "quan", "day"])
     p.add_argument("--days", type=int)
+    p.add_argument("--shop-seconds", type=int, help="đổi số giây mở Shop cho lượt chơi day")
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--port", type=int, default=8000, help="0 = cổng ngẫu nhiên")
     p.add_argument("--host", default="127.0.0.1")
@@ -295,8 +299,16 @@ def main(argv=None) -> int:
         contract = load_contract()
         tuning = contract["tuning"]
         scenario = load_scenario(a.scenario, a.mode, tuning)
+        if a.mode in ("day", "gather") and a.scenario is None and isinstance(tuning["gather"]["fish_initial"], int):
+            with open(os.path.join(WEB_DIR, "river.json"), encoding="utf-8") as profile:
+                tuning = dict(tuning, gather={**tuning["gather"], **json.load(profile)})
         if a.days is not None and (a.mode != "day" or not 1 <= a.days <= len(tuning["day_plan"])):
             raise BadInput("--days phải trong lịch và chỉ dùng với day")
+        if a.shop_seconds is not None:
+            if a.mode != "day" or a.shop_seconds <= 0:
+                raise BadInput("--shop-seconds phải dương và chỉ dùng với day")
+            shop = dict(tuning["shop"], max_ticks=a.shop_seconds * tuning["tick_hz"])
+            tuning = dict(tuning, shop=shop)
         inventory = read_inventory(a.inventory, ingredient_kinds(tuning), version=contract["contract_version"]) if a.inventory else None
         if inventory is not None and "stock" in scenario:
             raise BadInput("vừa có quan.stock vừa có --inventory")

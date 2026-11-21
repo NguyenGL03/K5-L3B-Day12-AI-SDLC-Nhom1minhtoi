@@ -55,7 +55,7 @@ def load_frames(path, buttons=BUTTONS_V10):
         if "move" in fr:
             m = fr["move"]
             ok = (isinstance(m, list) and len(m) == 2 and
-                  all(isinstance(c, (int, float)) and not isinstance(c, bool) and math.isfinite(c) and -1 <= c <= 1 for c in m))
+                  all(type(c) in (int, float) and -1 <= c <= 1 for c in m))
             if not ok:
                 raise BadInput(f"frame {i}: move phải là [x, d] (gather) hoặc [x, z] (quan), mỗi số trong [-1, 1]")
         for b in buttons:

@@ -11,4 +11,5 @@
 | Phase 2 | `NguyenGL03` | Codex | Tích hợp Gather, Quán, Shop, pause, headless và chế độ ngày trên trình duyệt | Chưa đo | Smoke cũ giả định 6 đàn và từ chối mode `day`. Đối chiếu lại với TICKET-02 và cập nhật hai kỳ vọng đã bị thay thế. |
 | Phase 3 | `NguyenGL03` | Codex | Kiểm schema, hao tươi và chuyển file giữa Gather và bộ kho cá thể phía Quán | Chưa đo | Thêm ca sát ngưỡng để phát hiện làm tròn độ tươi qua file có thể đưa hàng ươn về đúng 30. |
 | Phase 4 | `NguyenGL03` | Codex | Nối luật giá và giữ chỗ với v1.3, đo benchmark và soak, kiểm tương phản, đóng gói bản sửa | Chưa đo | Ca bàn giao của nhóm giả định đàn cá Phase 1 đứng yên. Chạy lại sau merge phát hiện lỗi và bổ sung fixture cá cố định cho ca hồi quy. |
+| Rà soát bàn giao | `NguyenGL03` | Codex | Đối chiếu bốn phase, sửa validate Gather và thêm fixture demo đủ một ngày | Chưa đo | Chạy CLI với loại nút hoặc cá không hợp lệ tái hiện `NameError`. Test hồi quy kiểm mã 2 và kiểm output chưa được tạo. |
 

@@ -1,13 +1,9 @@
-"""Nạp và kiểm scenario (Contract D). Trả về dict của đúng khối theo mode.
-
-KHUNG: kiểm cú pháp, id trùng, bộ đếm âm, khoang vượt sức chứa, trường lạ.
-TODO(nhóm): bổ sung kiểm mâu thuẫn mức luật mà nhóm cần (khách giữ chỗ quá kho, đơn assigned
-phải có đúng một món, khách eating thiếu giá/tip...) — xem PRD-0 mục D và 'Mâu thuẫn -> mã 2'.
-"""
+"""Nạp và kiểm schema scenario. QuanSim kiểm thêm liên kết món và giữ chỗ."""
 
 import json
 import math
 from collections import Counter
+from sys import float_info
 
 from .errors import BadInput
 from .inventory import ingredient_kinds, validate_individual_items, validate_items
@@ -136,7 +132,7 @@ def _validate_block(block, mode, tuning):
 
 
 def _num(v):
-    return isinstance(v, (int, float)) and not isinstance(v, bool)
+    return type(v) in (int, float) and -float_info.max <= v <= float_info.max
 
 
 def _nonneg_int(name, v):
@@ -197,24 +193,30 @@ def _validate_gather(b, tuning):
             raise BadInput("player.zero_oxy_ticks phải trong [0, 59]")
         if p["zero_oxy_ticks"] > 0 and not (oxy == 0 and pos[1] > g["surface_depth"]):
             raise BadInput("player.zero_oxy_ticks > 0 chỉ khi oxy = 0 và đang dưới nước")
+    node_kinds = {node["kind"] for node in g["nodes"]}
     for n in b.get("nodes", []):
-        if not isinstance(n.get("kind"), str) or n["kind"] not in {node["kind"] for node in g["nodes"]}:
-            raise BadInput(f"nodes.{n['id']}: kind phải là một trong {NODE_KINDS}")
+        if set(n) - {"id", "kind", "pos", "regrow_ticks"}:
+            raise BadInput(f"nodes.{n['id']}: trường lạ")
+        if not isinstance(n.get("kind"), str) or n["kind"] not in node_kinds:
+            raise BadInput(f"nodes.{n['id']}: kind phải là một trong {sorted(node_kinds)}")
         _pos(f"nodes.{n['id']}.pos", n.get("pos"), bounds)
         if n["pos"][1] != 0:
             raise BadInput(f"nodes.{n['id']}: nút hái nằm ở mặt nước (d = 0)")
         if "regrow_ticks" in n:
             _nonneg_int(f"nodes.{n['id']}.regrow_ticks", n["regrow_ticks"])
+    fish_fields = {"id", "kind", "pos", "heading_deg"}
+    if "fish_depths" in g:
+        fish_fields.add("age_ticks")
     for f in b.get("fish", []):
+        if set(f) - fish_fields:
+            raise BadInput(f"fish.{f['id']}: trường lạ")
         if not isinstance(f.get("kind"), str) or f["kind"] not in g["fish_yield"]:
-            raise BadInput(f"fish.{f['id']}: kind phải là một trong {FISH_KINDS}")
+            raise BadInput(f"fish.{f['id']}: kind phải là một trong {sorted(g['fish_yield'])}")
         _pos(f"fish.{f['id']}.pos", f.get("pos"), bounds)
         if f["pos"][1] <= g["surface_depth"]:
             raise BadInput(f"fish.{f['id']}: đàn cá phải ở dưới nước")
         if "heading_deg" in f and not _num(f["heading_deg"]):
             raise BadInput(f"fish.{f['id']}.heading_deg phải là số")
-
-
         if "age_ticks" in f:
             _nonneg_int(f"fish.{f['id']}.age_ticks", f["age_ticks"])
         if "fish_depths" in g and b.get("random_fish", True):

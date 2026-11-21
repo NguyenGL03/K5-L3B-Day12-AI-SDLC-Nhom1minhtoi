@@ -84,6 +84,10 @@ class GatherSim:
         for coll in (self.nodes, self.fish):
             for e in coll:
                 ids.reserve(e["id"])
+        self.lilies = t.get("lilies")
+        if self.lilies is not None:
+            for x in self.lilies["initial_x"]:
+                self._add_lily(x)
         if self.swimming_fish and "fish" not in scenario:
             for _ in range(t["fish_initial"]):
                 spawn_fish(t, self.fish, streams, ids)
@@ -216,14 +220,32 @@ class GatherSim:
         # 5. hết giờ
         if self.time_left_ticks <= 0:
             self._finish("time", events)
-        elif self.swimming_fish:
+        else:
+            self._spawn_wildlife(events)
+        return events
+
+    def _spawn_wildlife(self, events):
+        if self.swimming_fish:
             for school in sort_by_id(self.fish):
                 move_fish(school, self.t, self.rng, self.tick_hz)
             if self.tick % self.t["fish_spawn_ticks"] == 0 and len(self.fish) < self.t["fish_max"]:
                 school = spawn_fish(self.t, self.fish, self.rng, self.ids)
                 if school is not None:
                     events.append(("fish_spawned", {key: school[key] for key in ("id", "kind", "pos")}))
-        return events
+        if self.lilies is None or self.tick % self.lilies["spawn_ticks"] != 0:
+            return
+        if sum(node["kind"] == "bong_sung" for node in self.nodes) >= self.lilies["max_nodes"]:
+            return
+        occupied = {node["pos"][0] for node in self.nodes}
+        points = [x for x in self.lilies["spawn_x"] if x not in occupied]
+        if points:
+            node = self._add_lily(self.rng.get("lily_spawn").choice(points))
+            events.append(("node_spawned", {key: node[key] for key in ("id", "kind", "pos")}))
+
+    def _add_lily(self, x):
+        node = {"id": self.ids.new("N"), "kind": "bong_sung", "pos": [x, 0], "regrow_ticks": 0}
+        self.nodes.append(node)
+        return node
 
     # --- tiện ích ---------------------------------------------------------------
     def _at_surface(self) -> bool:

@@ -1,0 +1,16 @@
+{
+  "gather": {
+    "time_left_ticks": 2700,
+    "random_fish": false,
+    "monsters": [],
+    "nodes": [
+      {"id": "N1", "kind": "bong_sung", "pos": [8, 0]},
+      {"id": "N2", "kind": "bong_sung", "pos": [12, 0]}
+    ],
+    "fish": [{"id": "F1", "kind": "ca_loc", "pos": [12, 2]}]
+  },
+  "quan": {
+    "time_left_ticks": 1620,
+    "player": {"pos": [2, 8]}
+  }
+}

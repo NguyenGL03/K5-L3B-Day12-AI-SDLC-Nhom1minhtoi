@@ -1,0 +1,19 @@
+{"frames": [
+  {"tick": 0, "move": [1, 0]},
+  {"tick": 90, "move": [0, 0], "interact": true},
+  {"tick": 91, "move": [1, 0], "interact": false},
+  {"tick": 151, "move": [0, 0], "interact": true},
+  {"tick": 152, "move": [0, 1], "interact": false},
+  {"tick": 172, "move": [0, 0], "catch": true},
+  {"tick": 173, "move": [0, -1], "catch": false},
+  {"tick": 198, "move": [-1, 0]},
+  {"tick": 320, "move": [0, 0], "interact": true},
+  {"tick": 321, "interact": false},
+  {"tick": 442, "interact": true},
+  {"tick": 443, "interact": false},
+  {"tick": 810, "interact": true},
+  {"tick": 811, "move": [1, -0.86], "interact": false},
+  {"tick": 946, "move": [0, 0], "interact": true},
+  {"tick": 947, "interact": false},
+  {"tick": 1941, "shop_done": true}
+]}

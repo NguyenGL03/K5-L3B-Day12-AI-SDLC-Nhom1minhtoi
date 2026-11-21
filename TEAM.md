@@ -1,6 +1,6 @@
 # TEAM
 
-**Tên nhóm:** Nhom1minhtao  **Số người:** 2  (khớp `team_size` trong `game.contract.json`; đã ghi nhận quy mô 2 người trong `docs/clarify.md`)
+**Tên nhóm:** Nhom1minhtoi  **Số người:** 2  (khớp `team_size` trong `game.contract.json`; đã ghi nhận quy mô 2 người trong `docs/clarify.md`)
 
 | Thành viên | GitHub handle | Module chính | Vai quy trình | Người dự phòng cho |
 |---|---|---|---|---|

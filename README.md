@@ -18,8 +18,8 @@ Cách làm việc kỹ thuật là **tự do** (push thẳng, nhánh + PR, pair,
 Yêu cầu Python 3.10 trở lên và trình duyệt trên macOS hoặc Linux. Game dùng thư viện chuẩn Python. Benchmark cần Chromium, Chrome hoặc Edge.
 
 ```bash
-git clone <fork-của-nhóm> && cd <fork-của-nhóm>
-PYTHONPATH=tests:. python3 -m unittest discover -s tests -v        # smoke test
+git clone https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi.git && cd K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi
+python3 -m unittest discover -s tests -v                            # smoke test
 python3 -m chonoi.live --mode day                                   # mở địa chỉ in ra trên trình duyệt
 ```
 
@@ -35,19 +35,23 @@ python3 -m chonoi.soak --seed 7 --days 10 --out soak.json
 
 Bấm **Tương phản cao** ở góc trên để tăng độ tương phản và đọc cảnh báo oxy, thủy quái hoặc khách sắp giận bằng chữ. Benchmark mở trình duyệt headless ở 1280×720, chạy đường bơi cố định và đo nhịp khung hình thực. Có thể đặt `CHONOI_BROWSER` nếu trình duyệt nằm ngoài vị trí cài mặc định. [Kiểm chứng Phase 4](docs/verification/phase-4.md)
 
+Video demo và bản ZIP nằm trong [GitHub Release v1.0.1](https://github.com/NguyenGL03/K5-L3B-LAB-Day12-AI-SDLC-Nhom1minhtoi/releases/tag/v1.0.1). Kịch bản tập và lệnh PowerShell nằm trong [checklist bàn giao](docs/verification/phase-4.md#demo-và-nộp-bài).
+
 ## Tự do sáng tạo
 
 Ngoài phần đề yêu cầu, nhóm được **thêm** nhân vật, loài cá/cây, sinh vật, món, bản đồ, cơ chế, câu chuyện, đồ họa, âm nhạc… với ba điều kiện: **không phá phần cố định** (tắt ở headless), ghi mục **"Sáng tạo của nhóm"** trong README của nhóm, và **làm lõi đúng trước**.
 
-### Sáng tạo của nhóm (`Nhom1minhtao`)
-Các mở rộng dưới đây được cài đặt hoàn toàn ở tầng hiển thị trình duyệt (`chonoi/web/index.html`) hoặc module mở rộng tách biệt (`chonoi/sim/quan_stock.py`), **tắt hoàn toàn khi chạy headless** nên không ảnh hưởng tới kết quả chấm tự động:
+### Sáng tạo của nhóm (`Nhom1minhtoi`)
+Các hiệu ứng dưới đây nằm trong `chonoi/web/river.js` và `chonoi/web/index.html`, chỉ chạy trên trình duyệt:
 1. **Hiệu ứng thị giác & cảnh báo sinh tồn khi lặn (`gather`):**
    - Hiệu ứng bọt khí nổi lên theo nhịp bơi khi Út Sen lặn dưới mặt nước (`d > surface_depth`).
    - Viền cảnh báo nhịp thở (pulse đỏ quanh màn hình) khi lượng oxy xuống dưới 25% hoặc đang trong trạng thái ngạt (`zero_oxy_ticks > 0`).
 2. **Đèn lồng chợ nổi đêm & HUD quản lý quán thông minh (`quan`):**
    - Ánh đèn lồng vàng ấm tỏa sáng quanh từng bàn ăn trên ghe quán buổi tối.
-   - Hiển thị tên món tiếng Việt đầy đủ cho cả 6 món miền Tây (*Cá lóc nướng trui*, *Gỏi bông súng*, *Lẩu cá linh điên điển*, *Canh chua cá lóc*, *Cá kèo nướng*, *Lẩu mắm*), mã đơn hàng gắn với từng bếp/tay bưng, và màu sắc phân biệt trạng thái khách (*Đang chờ đặt bếp* / *Đã giao bếp nấu* / *Đang thưởng thức*).
-   - HUD **Kho khả dụng** tự động tính và hiển thị riêng số lượng nguyên liệu còn tự do so với số lượng đang được giữ chỗ (`giữ N`) cho các bàn đang chờ.
+   - Hiển thị tên món tiếng Việt, trạng thái bếp, món đang bưng và mức kiên nhẫn của khách.
+   - HUD **Kho khả dụng** loại hàng ươn và phần đã giữ cho khách khỏi số lượng có thể dùng, đồng thời hiển thị số cá thể đã ươn.
+
+Khi chơi `day` hoặc `gather` trên trình duyệt với bản đồ mặc định, sông có **12 đàn cá ban đầu**, thử sinh thêm mỗi **3 giây** đến tối đa 18 đàn. Có thêm hai bụi bông súng gần bến, với bụi mới xuất hiện mỗi **8 giây** đến tối đa 8 bụi. Cá mới có thể bắt, bông súng mới có thể hái và mọc lại. Chế độ headless và lượt chơi với `--scenario` dùng số liệu gốc.
 
 
 ## Lịch 3 giờ
