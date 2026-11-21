@@ -94,5 +94,97 @@ class GatherSlice1Test(unittest.TestCase):
                 self.assertEqual(json.load(f), {"items": {}})
 
 
+class GatherSlice2Test(unittest.TestCase):
+    def test_gather_node_tiebreak_regrow_and_hold_full(self):
+        tuning = _tuning()
+        g = tuning["gather"]
+        regrow_ticks = int(round(g["regrow_s"] * 60))
+        cap = int(g["hold_capacity"])
+        # Hai nút cách đều x=10 (N10 ở 9.0, N2 ở 11.0) -> phải chọn N2 trước vì id_key("N2") < id_key("N10")
+        sc = {
+            "player": {"pos": [10.0, 0.0]},
+            "nodes": [
+                {"id": "N10", "kind": "bong_sung", "pos": [9.0, 0.0]},
+                {"id": "N2", "kind": "bong_dien_dien", "pos": [11.0, 0.0]},
+            ],
+            "hold": ["ca_loc"] * (cap - 1),
+        }
+        s = Session("gather", tuning, sc, 1)
+        ip = InputPlayer([
+            {"tick": 0, "interact": True},
+            {"tick": 1, "interact": False},
+            {"tick": 2, "interact": True},
+        ])
+        ev0 = s.step(ip.advance(0))
+        self.assertEqual(len(ev0), 1)
+        self.assertEqual(ev0[0]["name"], "gather")
+        self.assertEqual(ev0[0]["data"]["node_id"], "N2")
+        self.assertEqual(s.sim.hold[-1], "bong_dien_dien")
+        self.assertEqual(len(s.sim.hold), cap)
+        n2 = next(n for n in s.sim.nodes if n["id"] == "N2")
+        self.assertEqual(n2["regrow_ticks"], regrow_ticks)
+
+        s.step(ip.advance(1))
+        # Bước tick 2: N10 vẫn ready nhưng giỏ đã đầy -> phát hold_full, N10 vẫn ready
+        ev2 = s.step(ip.advance(2))
+        self.assertEqual([e["name"] for e in ev2], ["hold_full"])
+        n10 = next(n for n in s.sim.nodes if n["id"] == "N10")
+        self.assertEqual(n10["regrow_ticks"], 0)
+
+    def test_node_regrown_after_countdown(self):
+        tuning = _tuning()
+        sc = {
+            "player": {"pos": [50.0, 0.0]},
+            "nodes": [{"id": "N1", "kind": "bong_sung", "pos": [12.0, 0.0], "regrow_ticks": 2}],
+        }
+        s = Session("gather", tuning, sc, 1)
+        ip = InputPlayer([])
+        self.assertEqual(s.step(ip.advance(0)), [])
+        ev1 = s.step(ip.advance(1))
+        self.assertEqual(ev1, [{"type": "event", "tick": 2, "phase": "gather", "name": "node_regrown", "data": {"node_id": "N1"}}])
+        self.assertTrue(s.snapshot()["nodes"][0]["ready"])
+
+    def test_catch_fish_underwater_cooldown_and_hold_full(self):
+        tuning = _tuning()
+        g = tuning["gather"]
+        cd_ticks = int(round(g["catch_cooldown_s"] * 60))
+        cap = int(g["hold_capacity"])
+        # Hai đàn cá cách đều (20, 10): F10 (ca_loc, yield 1) và F2 (ca_linh, yield 3) -> bắt F2 trước
+        sc = {
+            "player": {"pos": [20.0, 10.0]},
+            "fish": [
+                {"id": "F10", "kind": "ca_loc", "pos": [19.0, 10.0]},
+                {"id": "F2", "kind": "ca_linh", "pos": [21.0, 10.0]},
+            ],
+        }
+        s = Session("gather", tuning, sc, 1)
+        ip = InputPlayer([
+            {"tick": 0, "catch": True},
+            {"tick": 1, "catch": False},
+            {"tick": 2, "catch": True},  # đang cooldown -> không bắt được F10
+        ])
+        ev0 = s.step(ip.advance(0))
+        self.assertEqual(len(ev0), 1)
+        self.assertEqual(ev0[0]["name"], "fish_caught")
+        self.assertEqual(ev0[0]["data"]["fish_id"], "F2")
+        self.assertEqual(s.sim.hold, ["ca_linh"] * g["fish_yield"]["ca_linh"])
+        self.assertEqual(s.sim.catch_cd_ticks, cd_ticks)
+        self.assertEqual([f["id"] for f in s.sim.fish], ["F10"])
+
+        s.step(ip.advance(1))
+        ev2 = s.step(ip.advance(2))
+        self.assertEqual(ev2, [], "đang trong thời gian hồi chiêu catch_cd_ticks thì không bắt được")
+        self.assertEqual([f["id"] for f in s.sim.fish], ["F10"])
+
+        # Kiểm tra hold_full khi bắt ca_linh (yield 3) nhưng giỏ chỉ còn 2 chỗ trống
+        s_full = Session("gather", tuning, {
+            "player": {"pos": [15.0, 5.0]},
+            "hold": ["ca_loc"] * (cap - 2),
+        }, 1)
+        ev_full = s_full.step(InputPlayer([{"tick": 0, "catch": True}]).advance(0))
+        self.assertEqual([e["name"] for e in ev_full], ["hold_full"])
+        self.assertEqual(len(s_full.sim.fish), 6, "giỏ không đủ chỗ thì đàn cá không bị mất")
+
+
 if __name__ == "__main__":
     unittest.main()
