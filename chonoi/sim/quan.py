@@ -21,10 +21,17 @@ class QuanSim:
     mode = "quan"
     phase = "quan"
 
-    def __init__(self, tuning, scenario, streams, ids, inventory=None):
+    def __init__(self, tuning, scenario, streams, ids, inventory=None, *, day_plan=None, money=0, earned=0):
         t = tuning["quan"]
         self.t = t
-        self.menu = tuning["menu"]
+        menu = tuning["menu"]
+        self.kinds = {kind for dish in menu.values() for kind in dish["recipe"]}
+        self.menu = menu
+        if day_plan is not None:
+            dishes = day_plan.get("dishes") if isinstance(day_plan, dict) else None
+            if not isinstance(dishes, dict) or not dishes or not dishes.keys() <= menu.keys():
+                raise BadInput("kế hoạch ngày phải dùng món trong thực đơn")
+            self.menu = {dish_id: menu[dish_id] for dish_id in dishes}
         self.rng = streams
         self.ids = ids
         self.tick_hz = tuning["tick_hz"]
@@ -44,8 +51,9 @@ class QuanSim:
         self.ramp_max_ticks = t["ramp_max_ticks"]
         self._tgt = None
         self._ramp_left = 0
-        # kho: --inventory HOẶC scenario.stock (cả hai -> cli đã báo mã 2)
-        self.stock = dict(inventory if inventory is not None else scenario.get("stock", {}))
+        if inventory is not None and "stock" in scenario:
+            raise BadInput("vừa có quan.stock vừa có kho bàn giao")
+        self.stock = validate_items(inventory if inventory is not None else scenario.get("stock", {}), self.kinds)
         self.hand = scenario.get("hand")
         self.time_left_ticks = scenario.get("time_left_ticks", self._ticks(t["duration_s"]))
         self.reputation = scenario.get("reputation", t["reputation_initial"])
@@ -64,8 +72,12 @@ class QuanSim:
                 if available[kind] < 0:
                     raise BadInput(f"customers.{customer['id']}: giữ chỗ vượt số lượng còn trong kho")
         self._match_scenario_orders()
-        self.money = 0
-        self.earned = 0
+        _nonneg_int("money", money)
+        _nonneg_int("earned", earned)
+        if money > earned:
+            raise BadInput("money không được vượt earned")
+        self.money = money
+        self.earned = earned
         self.shift_earned = 0
         self.done = False
         self.reason = None
@@ -119,7 +131,7 @@ class QuanSim:
             raise BadInput(f"{name}: khách đang chờ chưa có timer ăn hoặc tiền boa")
         reserved = self.menu[customer["dish_id"]]["recipe"] if status == "reserved" else {}
         actual = customer.get("reserved", reserved)
-        validate_items(actual)
+        validate_items(actual, self.kinds)
         if actual != reserved:
             raise BadInput(f"{name}.reserved không khớp trạng thái và công thức")
         customer["reserved"] = dict(reserved)
